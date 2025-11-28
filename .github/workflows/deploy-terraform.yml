@@ -33,7 +33,7 @@ jobs:
       # 4️⃣ Terraform Init (uses backend.tf automatically)
       - name: Terraform init
         working-directory: terraform
-        run: terraform init
+        run: terraform init -backend-config=backend.tf
 
       # 5️⃣ Terraform Plan
       - name: Terraform plan
