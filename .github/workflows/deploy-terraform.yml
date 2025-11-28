@@ -1,0 +1,57 @@
+name: Deploy Terraform
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write      # Required for OIDC
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 1: Authenticate to AWS using GitHub OIDC Role
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::905418049972:role/GitHubOIDCRole
+          aws-region: us-east-1
+
+      # Step 2: Configure Assume Role into Terraform Execution Role
+      - name: Assume Terraform Execution Role
+        id: assume_role
+        run: |
+          CREDS=$(aws sts assume-role \
+            --role-arn "arn:aws:iam::905418049972:role/TerraformExecutionRole" \
+            --role-session-name terraform_session)
+
+          echo "AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
+
+      # Step 3: Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Step 4: Initialize backend
+      - name: Terraform init
+        working-directory: terraform
+        run: terraform init
+
+      # Step 5: Plan
+      - name: Terraform plan
+        working-directory: terraform
+        run: terraform plan
+
+      # Step 6: Apply
+      - name: Terraform apply
+        working-directory: terraform
+        run: terraform apply -auto-approve
