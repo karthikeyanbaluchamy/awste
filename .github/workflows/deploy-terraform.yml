@@ -49,7 +49,6 @@ jobs:
           terraform workspace show
           terraform state list
           terraform state show aws_s3_bucket.example
-          terraform untaint aws_s3_bucket.example
           aws s3api head-object \
             --bucket terraform1987980980 \
             --key dev/terraform.tfstate \
