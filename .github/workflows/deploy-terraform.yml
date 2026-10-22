@@ -13,6 +13,7 @@ permissions:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
 
     steps:
       # 1️⃣ Checkout code
@@ -50,10 +51,10 @@ jobs:
           terraform state show aws_s3_bucket.example
           terraform plan -refresh=false -no-color
 
-      # 6️⃣ Terraform Apply
-      #- name: Terraform apply
-      #  working-directory: terraform
-      #  run: terraform apply -auto-approve
+      #6️⃣ Terraform Apply
+      - name: Terraform apply
+        working-directory: terraform
+        run: terraform apply -auto-approve
       - name: Debug Terraform state
         working-directory: terraform
         run: |
