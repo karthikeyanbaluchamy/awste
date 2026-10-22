@@ -39,7 +39,6 @@ jobs:
       - name: Terraform plan
         working-directory: terraform
         run: |
-          terraform untaint aws_s3_bucket.example
           terraform plan
 
       - name: Diagnose Terraform state and AWS identity
