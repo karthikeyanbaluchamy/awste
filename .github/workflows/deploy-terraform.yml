@@ -40,10 +40,21 @@ jobs:
         working-directory: terraform
         run: terraform plan
 
-      # 6️⃣ Terraform Apply
-      - name: Terraform apply
+      - name: Diagnose Terraform state and AWS identity
         working-directory: terraform
-        run: terraform apply -auto-approve
+        run: |
+          aws sts get-caller-identity
+          terraform workspace show
+          terraform state list
+          aws s3api head-object \
+            --bucket terraform1987980980 \
+            --key dev/terraform.tfstate \
+            --region us-east-1
+
+      # 6️⃣ Terraform Apply
+      #- name: Terraform apply
+      #  working-directory: terraform
+      #  run: terraform apply -auto-approve
       - name: Debug Terraform state
         working-directory: terraform
         run: |
