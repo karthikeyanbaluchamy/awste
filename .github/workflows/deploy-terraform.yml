@@ -28,6 +28,13 @@ jobs:
       - name: Terraform init
         working-directory: terraform
         run: terraform init
+        
+      - name: Verify S3 permissions
+        run: |
+          aws iam simulate-principal-policy \
+            --policy-source-arn arn:aws:iam::905418049972:role/ec2TerraformExecutionRole-production \
+            --action-names s3:ListBucket s3:GetBucketLocation \
+            --resource-arns arn:aws:s3:::example-bucket-karthitest1987
 
       - name: Diagnose AWS and Terraform
         working-directory: terraform
