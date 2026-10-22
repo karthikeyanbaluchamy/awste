@@ -60,3 +60,6 @@ jobs:
         run: |
          terraform workspace show
          terraform state list
+      - name: Inspect Terraform state
+        working-directory: terraform
+        run: terraform state show aws_s3_bucket.example
