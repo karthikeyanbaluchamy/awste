@@ -13,6 +13,7 @@ permissions:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
 
     steps:
       # 1️⃣ Checkout code
@@ -38,9 +39,27 @@ jobs:
       # 5️⃣ Terraform Plan
       - name: Terraform plan
         working-directory: terraform
-        run: terraform plan
+        run: |
+          terraform plan
 
-      # 6️⃣ Terraform Apply
+      - name: Diagnose Terraform state and AWS identity
+        working-directory: terraform
+        run: |
+          aws sts get-caller-identity
+          terraform workspace show
+          terraform state list
+          terraform state show aws_s3_bucket.example
+          terraform plan -refresh=false -no-color
+
+      #6️⃣ Terraform Apply
       - name: Terraform apply
         working-directory: terraform
         run: terraform apply -auto-approve
+      - name: Debug Terraform state
+        working-directory: terraform
+        run: |
+         terraform workspace show
+         terraform state list
+      - name: Inspect Terraform state
+        working-directory: terraform
+        run: terraform state show aws_s3_bucket.example
