@@ -48,10 +48,7 @@ jobs:
           terraform workspace show
           terraform state list
           terraform state show aws_s3_bucket.example
-          aws s3api head-object \
-            --bucket terraform1987980980 \
-            --key dev/terraform.tfstate \
-            --region us-east-1
+          terraform plan -refresh=false -no-color
 
       # 6️⃣ Terraform Apply
       #- name: Terraform apply
